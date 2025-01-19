@@ -1,12 +1,12 @@
 import { execSync } from "child_process";
 import fs from "fs";
-import path from "path";
+import path, { relative } from "path";
 import { createInterface } from "readline";
 const rl = createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-let currDir = __dirname.split("/").slice(0, -1).join("/").trim();
+let pwd = __dirname.split("/").slice(0, -1).join("/").trim();
 function runCommand() {
   rl.question("$ ", (answer) => {
     const command = answer.split(" ");
@@ -25,12 +25,15 @@ function runCommand() {
         rl.write(output.trimStart() + "\n");
         break;
       case "pwd":
-        rl.write(currDir + "\n");
+        rl.write(pwd + "\n");
         break;
       case "cd":
-        const dir = command[1];
-        if (fs.existsSync(dir)) {
-          currDir = command[1];
+        const dir =
+          command[1].slice(0, 2) === "./"
+            ? path.join(pwd, command[1].slice(1))
+            : command[1];
+        if (fs.existsSync(dir) || dir.slice(0, 3) === "../") {
+          changeDir(dir);
         } else {
           rl.write(`cd: ${command[1]}: No such file or directory\n`);
         }
@@ -86,4 +89,25 @@ const validCommands = (command: string): boolean => {
     }
   }
   return false;
+};
+
+const changeDir = (dir: string): void => {
+  //current dir
+  if (dir.slice(0, 2) === "./") {
+    if (fs.existsSync(dir)) {
+      pwd += dir.slice(1);
+    }
+  } else if (dir.slice(0, 3) === "../") {
+    goinback(dir);
+  } else {
+    pwd = dir;
+  }
+};
+
+const goinback = (path: string) => {
+  if (path.length < 3) {
+    return;
+  }
+  pwd = pwd.split("/").slice(0, -1).join("/");
+  goinback(path.slice(3));
 };
