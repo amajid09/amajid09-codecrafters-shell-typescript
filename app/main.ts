@@ -13,6 +13,15 @@ function runCommand() {
         rl.close();
         handleExit(code);
         break;
+      case "type":
+        const type = command[1];
+        const validTypes = ["echo", "exit", 'type'];
+        if (validTypes.includes(type)) {
+          rl.write(`${type} is a shell builtin` + "\n");
+        } else {
+          rl.write(`${type}: not found\n`);
+        }
+        break;
       case "echo":
         const output = command.slice(1).join(" ");
         rl.write(output.trimStart() + "\n");
