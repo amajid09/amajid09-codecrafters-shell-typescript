@@ -1,5 +1,6 @@
 import { execSync } from "child_process";
 import fs from "fs";
+import path from "path";
 import { createInterface } from "readline";
 const rl = createInterface({
   input: process.stdin,
@@ -22,10 +23,16 @@ function runCommand() {
         const output = command.slice(1).join(" ");
         rl.write(output.trimStart() + "\n");
         break;
+      case "pwd":
+        const currDir = __dirname.split('/').slice(0, -1).join('/').trim()
+        rl.write(currDir + "\n");
+        break;
       default:
         const isValid = validCommands(command[0]);
         if (isValid) {
-          const stdout = execSync(command.join(" ").trim(), { encoding: "utf8" });
+          const stdout = execSync(command.join(" ").trim(), {
+            encoding: "utf8",
+          });
           rl.write(stdout.trim() + "\n");
         } else {
           rl.write(`${answer}: command not found\n`);
@@ -38,7 +45,7 @@ function runCommand() {
 runCommand();
 
 const typeCommand = (type: string): string => {
-  const validTypes = ["echo", "exit", "type"];
+  const validTypes = ["echo", "exit", "type", "pwd"];
   const pathsenv = process.env.PATH ?? "";
   if (validTypes.includes(type)) {
     return `${type} is a shell builtin\n`;
