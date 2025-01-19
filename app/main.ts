@@ -1,5 +1,6 @@
-import { createInterface, Interface } from "readline";
+import { execSync } from "child_process";
 import fs from "fs";
+import { createInterface } from "readline";
 const rl = createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -22,7 +23,13 @@ function runCommand() {
         rl.write(output.trimStart() + "\n");
         break;
       default:
-        rl.write(`${answer}: command not found\n`);
+        const isValid = validCommands(command[0]);
+        if (isValid) {
+          const stdout = execSync(command.join(" ").trim(), { encoding: "utf8" });
+          rl.write(stdout.trim() + "\n");
+        } else {
+          rl.write(`${answer}: command not found\n`);
+        }
     }
     runCommand();
   });
@@ -52,4 +59,16 @@ const handleExit = (code: string): void => {
   if (code === "1") {
     process.exit(Number(code));
   }
+};
+
+const validCommands = (command: string): boolean => {
+  const pathsenv = process.env.PATH ?? "";
+
+  const paths = pathsenv.split(":");
+  for (let path of paths) {
+    if (fs.existsSync(path + "/" + command)) {
+      return true;
+    }
+  }
+  return false;
 };
