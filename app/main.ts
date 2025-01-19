@@ -27,7 +27,6 @@ runCommand();
 
 const handleExit = (code: string): void => {
   if (code === "0") {
-    rl.close();
     process.exit(code);
   }
   if (code === "1") {
