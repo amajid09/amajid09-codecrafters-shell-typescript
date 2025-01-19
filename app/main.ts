@@ -10,6 +10,7 @@ function runCommand() {
     switch (command[0]) {
       case "exit":
         const code = command[1];
+        rl.close();
         handleExit(code);
         break;
       case "echo":
@@ -27,9 +28,9 @@ runCommand();
 
 const handleExit = (code: string): void => {
   if (code === "0") {
-    process.exit(code);
+    process.exit(Number(code));
   }
   if (code === "1") {
-    process.exit(code);
+    process.exit(Number(code));
   }
 };
