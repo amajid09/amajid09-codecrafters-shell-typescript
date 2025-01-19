@@ -94,11 +94,11 @@ const validCommands = (command: string): boolean => {
 const changeDir = (dir: string): void => {
   //current dir
   if (dir.slice(0, 2) === "./") {
-    if (fs.existsSync(dir)) {
-      pwd += dir.slice(1);
-    }
+    pwd += dir.slice(1);
   } else if (dir.slice(0, 3) === "../") {
     goinback(dir);
+  } else if (dir === '~') {
+    pwd = '/home'
   } else {
     pwd = dir;
   }
