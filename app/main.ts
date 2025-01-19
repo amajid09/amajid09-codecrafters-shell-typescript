@@ -4,26 +4,33 @@ const rl = createInterface({
   input: process.stdin,
   output: process.stdout,
 });
-let run = true;
-let invalid = true;
 function runCommand() {
   rl.question("$ ", (answer) => {
-    if (
-      answer.split(" ").length > 1 &&
-      answer.split(" ")[0] === "exit" &&
-      answer.split(" ")[1] === "0"
-    ) {
-      run = false;
-      invalid = false;
-      rl.close()
+    const command = answer.split(" ");
+    switch (command[0]) {
+      case "exit":
+        const code = command[1];
+        handleExit(code);
+        break;
+      case "echo":
+        const output = command.slice(1).join(" ");
+        rl.write(output.trimStart() + "\n");
+        break;
+      default:
+        rl.write(`${answer}: command not found\n`);
     }
-    if (invalid) {
-      rl.write(`${answer}: command not found\n`);
-    }
-    if (run) {
-      runCommand();
-    }
+    runCommand();
   });
 }
 
 runCommand();
+
+const handleExit = (code: string): void => {
+  if (code === "0") {
+    rl.close();
+    process.exit(code);
+  }
+  if (code === "1") {
+    process.exit(code);
+  }
+};
