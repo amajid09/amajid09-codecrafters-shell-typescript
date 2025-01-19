@@ -32,7 +32,7 @@ function runCommand() {
           command[1].slice(0, 2) === "./"
             ? path.join(pwd, command[1].slice(1))
             : command[1];
-        if (fs.existsSync(dir) || dir.slice(0, 3) === "../") {
+        if (fs.existsSync(dir) || ['./', '~'].includes(dir.slice(0, 3))) {
           changeDir(dir);
         } else {
           rl.write(`cd: ${command[1]}: No such file or directory\n`);
@@ -98,7 +98,7 @@ const changeDir = (dir: string): void => {
   } else if (dir.slice(0, 3) === "../") {
     goinback(dir);
   } else if (dir === '~') {
-    pwd = '/home'
+    pwd = process.env.HOME ?? '/home'
   } else {
     pwd = dir;
   }
