@@ -1,5 +1,5 @@
-import { createInterface } from "readline";
-
+import { createInterface, Interface } from "readline";
+import fs from "fs";
 const rl = createInterface({
   input: process.stdin,
   output: process.stdout,
@@ -15,12 +15,7 @@ function runCommand() {
         break;
       case "type":
         const type = command[1];
-        const validTypes = ["echo", "exit", 'type'];
-        if (validTypes.includes(type)) {
-          rl.write(`${type} is a shell builtin` + "\n");
-        } else {
-          rl.write(`${type}: not found\n`);
-        }
+        rl.write(typeCommand(type));
         break;
       case "echo":
         const output = command.slice(1).join(" ");
@@ -34,6 +29,21 @@ function runCommand() {
 }
 
 runCommand();
+
+const typeCommand = (type: string): string => {
+  const validTypes = ["echo", "exit", "type"];
+  const pathsenv = process.env.PATH ?? "";
+  if (validTypes.includes(type)) {
+    return `${type} is a shell builtin\n`;
+  }
+  const paths = pathsenv.split(":");
+  for (let path of paths) {
+    if (fs.existsSync(path + "/" + type)) {
+      return `${type} is ${path}\/${type}\n`;
+    }
+  }
+  return `${type}: not found\n`;
+};
 
 const handleExit = (code: string): void => {
   if (code === "0") {
