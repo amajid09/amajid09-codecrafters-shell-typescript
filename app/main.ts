@@ -22,7 +22,18 @@ function runCommand() {
         break;
       case "echo":
         const output = command.slice(1).join(" ");
-        rl.write(output.trimStart() + "\n");
+        if (output.includes("'")) {
+          rl.write(output.replaceAll("'", "").trim() + '\n');
+        } else {
+          rl.write(
+            output
+              .replaceAll("'", "")
+              .split(" ")
+              .filter((out) => out !== "")
+              .join(" ")
+              .trimStart() + "\n"
+          );
+        }
         break;
       case "pwd":
         rl.write(pwd + "\n");
@@ -32,7 +43,7 @@ function runCommand() {
           command[1].slice(0, 2) === "./"
             ? path.join(pwd, command[1].slice(1))
             : command[1];
-        if (fs.existsSync(dir) || ['./', '~'].includes(dir.slice(0, 3))) {
+        if (fs.existsSync(dir) || ["./", "~"].includes(dir.slice(0, 3))) {
           changeDir(dir);
         } else {
           rl.write(`cd: ${command[1]}: No such file or directory\n`);
@@ -97,8 +108,8 @@ const changeDir = (dir: string): void => {
     pwd += dir.slice(1);
   } else if (dir.slice(0, 3) === "../") {
     goinback(dir);
-  } else if (dir === '~') {
-    pwd = process.env.HOME ?? '/home'
+  } else if (dir === "~") {
+    pwd = process.env.HOME ?? "/home";
   } else {
     pwd = dir;
   }
