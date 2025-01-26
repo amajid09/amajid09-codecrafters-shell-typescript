@@ -22,8 +22,36 @@ function runCommand() {
         break;
       case "echo":
         const output = command.slice(1).join(" ");
-        if (output.includes("'")) {
-          rl.write(output.replaceAll("'", "").trim() + '\n');
+        if (output.includes("'") || output.includes('"')) {
+          const tokenizeQuotes = (output: string) => {
+            let words = "";
+            let word = "";
+            let insideQuotes = false;
+            let spaceInbetween = 0;
+            let start = output.charAt(0);
+            for (let char of output) {
+              if (char === start) {
+                insideQuotes = !insideQuotes;
+                spaceInbetween = 0;
+              }
+              if (insideQuotes) {
+                word += char !== start ? char : "";
+              } else {
+                words += word;
+                word = "";
+              }
+              if (!insideQuotes && char === " ") {
+                spaceInbetween++;
+              }
+              if (spaceInbetween === 1) {
+                word += " ";
+                spaceInbetween++;
+              }
+            }
+            return words;
+          };
+          const words = tokenizeQuotes(output);
+          rl.write(words + "\n");
         } else {
           rl.write(
             output
