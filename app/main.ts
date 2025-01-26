@@ -64,7 +64,7 @@ function runCommand() {
                   slash = output.charAt(i + 1);
                 }
               }
-              if (char === " " || char === "\\") {
+              if (char === " " ) {
                 space++;
                 continue;
               } else {
