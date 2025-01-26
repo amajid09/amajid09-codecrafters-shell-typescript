@@ -53,14 +53,32 @@ function runCommand() {
           const words = tokenizeQuotes(output);
           rl.write(words + "\n");
         } else {
-          rl.write(
-            output
-              .replaceAll("'", "")
-              .split(" ")
-              .filter((out) => out !== "")
-              .join(" ")
-              .trimStart() + "\n"
-          );
+          const backSlash = (output: string) => {
+            let word = "";
+            let space = 0;
+            let slash = "";
+            for (let i = 0; i < output.length; i++) {
+              const char = output.charAt(i);
+              if (char === "\\") {
+                if (i < output.length) {
+                  slash = output.charAt(i + 1);
+                }
+              }
+              if (char === " " || char === "\\") {
+                space++;
+                continue;
+              } else {
+                console.log('slash', slash.length) 
+                let updatedChar = slash + char;
+                word += space > 0 ? " " + updatedChar : updatedChar;
+                console.log('word', word) 
+                space = 0;
+                slash = ''
+              }
+            }
+            return word;
+          };
+          rl.write(backSlash(output) + "\n");
         }
         break;
       case "pwd":
